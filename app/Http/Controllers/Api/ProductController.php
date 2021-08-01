@@ -2,17 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Providers\RouteServiceProvider;
-
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules;
+use Illuminate\Http\Request;
+use App\Models\Product;
 
-class UserController extends Controller
+class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,8 +16,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
-        return response(["response" => $users]);
+        $products = Product::all();
+        return ["response" => $products];
     }
 
     /**
@@ -34,31 +29,21 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required',
+            'product_image_url' => 'required|string',
         ], [
-            'name.required' => 'The "name" field is required',
-            'name.unique' => 'The "name" field has already been taken',
-            'email.required' => 'The "email" field is required',
-            'email.unique' => 'The "email" field has already been taken',
-            'password.required' => 'The "password" field is required',
-            'password.unique' => 'The "password" field has already been taken',
+            'product_image_url.required' => 'The "product_image_url" field is required',
         ]);
 
         if ($validator->fails()) {
             return response(["errors" => $validator->errors()->all()]);
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+        $product = Product::create([
+            'product_image_url' => $request->product_image_url,
         ]);
 
-        $token_string = $user->createToken('API Token')->plainTextToken;
 
-        return response(["response" => $user, "token" => $token_string]);
+        return response(["response" => $product]);
     }
 
     /**
